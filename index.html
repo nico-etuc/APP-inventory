@@ -228,25 +228,70 @@ function Toast({ msg, onDone }) {
 }
 
 // ─── SCANNER SCREEN ──────────────────────────────────────────────────────────
+const NATIVE_FORMATS = ['aztec','code_39','code_93','code_128','codabar','data_matrix','ean_8','ean_13','pdf417','qr_code','upc_a','upc_e'];
+
 function ScanScreen({ onScanned }) {
   const [scanning, setScanning] = useState(false);
   const [manual, setManual] = useState('');
   const [error, setError] = useState('');
-  const scannerRef = useRef(null);
+  const [useNative] = useState(() => 'BarcodeDetector' in window);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const rafRef = useRef(null);
   const html5Ref = useRef(null);
 
-  const startScan = useCallback(async () => {
+  // ── Native BarcodeDetector (Android Chrome / Samsung Browser)
+  const startNativeScan = useCallback(async () => {
+    setError('');
+    setScanning(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+      });
+      streamRef.current = stream;
+      // wait for videoRef to be rendered
+      await new Promise(r => setTimeout(r, 100));
+      if (!videoRef.current) return;
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
+      const detector = new BarcodeDetector({ formats: NATIVE_FORMATS });
+      const scan = async () => {
+        if (!streamRef.current || !videoRef.current) return;
+        try {
+          const codes = await detector.detect(videoRef.current);
+          if (codes.length > 0) {
+            if (navigator.vibrate) navigator.vibrate(80);
+            const { rawValue, format } = codes[0];
+            stopNativeScan();
+            onScanned(rawValue, format);
+            return;
+          }
+        } catch {}
+        rafRef.current = requestAnimationFrame(scan);
+      };
+      rafRef.current = requestAnimationFrame(scan);
+    } catch {
+      setError('Caméra inaccessible. Utilisez la saisie manuelle.');
+      setScanning(false);
+    }
+  }, [onScanned]);
+
+  const stopNativeScan = useCallback(() => {
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setScanning(false);
+  }, []);
+
+  // ── html5-qrcode fallback (autres navigateurs)
+  const startHtml5Scan = useCallback(async () => {
     setError('');
     setScanning(true);
     try {
       await new Promise(r => setTimeout(r, 300));
       const f = Html5QrcodeSupportedFormats;
       const scanner = new Html5Qrcode('qr-reader', {
-        formatsToSupport: [
-          f.QR_CODE, f.CODE_39, f.CODE_93, f.CODE_128,
-          f.DATA_MATRIX, f.EAN_13, f.EAN_8, f.PDF_417,
-          f.UPC_A, f.UPC_E, f.AZTEC,
-        ]
+        formatsToSupport: [f.QR_CODE, f.CODE_39, f.CODE_93, f.CODE_128, f.DATA_MATRIX, f.EAN_13, f.EAN_8, f.PDF_417, f.UPC_A, f.UPC_E, f.AZTEC]
       });
       html5Ref.current = scanner;
       await scanner.start(
@@ -255,23 +300,30 @@ function ScanScreen({ onScanned }) {
         (decoded, result) => {
           const fmt = result?.result?.format?.formatName || 'barcode';
           if (navigator.vibrate) navigator.vibrate(80);
-          stopScan();
+          stopHtml5Scan();
           onScanned(decoded, fmt);
         },
         () => {}
       );
-    } catch (e) {
+    } catch {
       setError('Caméra inaccessible. Utilisez la saisie manuelle.');
       setScanning(false);
     }
   }, [onScanned]);
 
-  const stopScan = useCallback(async () => {
+  const stopHtml5Scan = useCallback(async () => {
     try { if (html5Ref.current) { await html5Ref.current.stop(); html5Ref.current = null; } } catch {}
     setScanning(false);
   }, []);
 
-  useEffect(() => () => { try { html5Ref.current?.stop(); } catch {} }, []);
+  const startScan = useNative ? startNativeScan : startHtml5Scan;
+  const stopScan  = useNative ? stopNativeScan  : stopHtml5Scan;
+
+  useEffect(() => () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+    try { html5Ref.current?.stop(); } catch {}
+  }, []);
 
   return (
     <div>
@@ -283,10 +335,14 @@ function ScanScreen({ onScanned }) {
           </button>
         ) : (
           <>
-            <div className="scanner-wrap" ref={scannerRef}>
-              <div id="qr-reader" style={{ width: '100%' }}></div>
+            <div className="scanner-wrap">
+              {useNative
+                ? <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', display: 'block', borderRadius: 'var(--radius)' }} />
+                : <div id="qr-reader" style={{ width: '100%' }}></div>
+              }
+              <div className="scan-overlay"><div className="scan-frame scan-pulse" /></div>
             </div>
-            <div className="scan-status scan-pulse">⬡ Pointez vers un code-barres ou QR code — étiquette Dell, EAN, Code 128…</div>
+            <div className="scan-status scan-pulse">⬡ Alignez le code-barres dans le cadre — étiquette Dell, EAN, QR…</div>
             <button className="btn btn-secondary btn-full" style={{ marginTop: 10 }} onClick={stopScan}>Arrêter</button>
           </>
         )}
@@ -296,7 +352,7 @@ function ScanScreen({ onScanned }) {
       <div className="card">
         <div className="card-title" style={{ marginBottom: 12 }}>⌨️ Saisie manuelle</div>
         <div className="form-group">
-          <input className="form-input" placeholder="Numéro de série, code asset…" value={manual} onChange={e => setManual(e.target.value)}
+          <input className="form-input" placeholder="Service Tag Dell (ex: FKM9L33)…" value={manual} onChange={e => setManual(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && manual.trim()) { onScanned(manual.trim(), 'manual'); setManual(''); } }} />
         </div>
         <button className="btn btn-primary btn-full" disabled={!manual.trim()}
@@ -310,7 +366,7 @@ function ScanScreen({ onScanned }) {
           <b style={{ color: 'var(--accent)' }}>Formats supportés</b><br />
           <b style={{ color: 'var(--text)' }}>Code-barres :</b> Code 39 · Code 93 · Code 128 · EAN-13 · EAN-8 · UPC-A · UPC-E<br />
           <b style={{ color: 'var(--text)' }}>2D :</b> QR Code · DataMatrix · Aztec · PDF417<br />
-          <span style={{ color: 'var(--text3)', fontSize: 12 }}>✓ Service Tag / Asset Tag Dell (Code 39)</span>
+          <span style={{ color: 'var(--text3)', fontSize: 12 }}>✓ Service Tag Dell (Code 39) · {useNative ? '⚡ Moteur natif Android actif' : '🔄 Moteur de secours actif'}</span>
         </div>
       </div>
     </div>
