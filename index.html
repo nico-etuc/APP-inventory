@@ -83,7 +83,7 @@
   #qr-reader video { border-radius: var(--radius); }
   #qr-reader > div { border: none !important; }
   .scan-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
-  .scan-frame { width: 60%; aspect-ratio: 1; border: 2px solid var(--accent); border-radius: 16px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); }
+  .scan-frame { width: 86%; height: 110px; border: 2px solid var(--accent); border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); }
   .scan-frame::before, .scan-frame::after { content: ''; position: absolute; width: 20px; height: 20px; border-color: var(--accent); border-style: solid; }
   .scan-pulse { animation: pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -240,15 +240,23 @@ function ScanScreen({ onScanned }) {
     setScanning(true);
     try {
       await new Promise(r => setTimeout(r, 300));
-      const scanner = new Html5Qrcode('qr-reader');
+      const f = Html5QrcodeSupportedFormats;
+      const scanner = new Html5Qrcode('qr-reader', {
+        formatsToSupport: [
+          f.QR_CODE, f.CODE_39, f.CODE_93, f.CODE_128,
+          f.DATA_MATRIX, f.EAN_13, f.EAN_8, f.PDF_417,
+          f.UPC_A, f.UPC_E, f.AZTEC,
+        ]
+      });
       html5Ref.current = scanner;
       await scanner.start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        (decoded) => {
+        { fps: 15, qrbox: { width: 260, height: 100 } },
+        (decoded, result) => {
+          const fmt = result?.result?.format?.formatName || 'barcode';
           if (navigator.vibrate) navigator.vibrate(80);
           stopScan();
-          onScanned(decoded, 'QR');
+          onScanned(decoded, fmt);
         },
         () => {}
       );
@@ -278,7 +286,7 @@ function ScanScreen({ onScanned }) {
             <div className="scanner-wrap" ref={scannerRef}>
               <div id="qr-reader" style={{ width: '100%' }}></div>
             </div>
-            <div className="scan-status scan-pulse">⬡ Pointez vers un QR code ou code-barres</div>
+            <div className="scan-status scan-pulse">⬡ Pointez vers un code-barres ou QR code — étiquette Dell, EAN, Code 128…</div>
             <button className="btn btn-secondary btn-full" style={{ marginTop: 10 }} onClick={stopScan}>Arrêter</button>
           </>
         )}
@@ -300,7 +308,9 @@ function ScanScreen({ onScanned }) {
       <div className="card" style={{ background: 'rgba(0,229,160,0.04)', borderColor: 'rgba(0,229,160,0.15)' }}>
         <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.6 }}>
           <b style={{ color: 'var(--accent)' }}>Formats supportés</b><br />
-          QR Code · EAN-13 · EAN-8 · Code 128 · UPC · DataMatrix · PDF417 · Code 39
+          <b style={{ color: 'var(--text)' }}>Code-barres :</b> Code 39 · Code 93 · Code 128 · EAN-13 · EAN-8 · UPC-A · UPC-E<br />
+          <b style={{ color: 'var(--text)' }}>2D :</b> QR Code · DataMatrix · Aztec · PDF417<br />
+          <span style={{ color: 'var(--text3)', fontSize: 12 }}>✓ Service Tag / Asset Tag Dell (Code 39)</span>
         </div>
       </div>
     </div>
