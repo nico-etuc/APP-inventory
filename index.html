@@ -11,577 +11,457 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0f14;
-    --surface: #161820;
-    --surface2: #1e2028;
-    --border: #2a2d38;
-    --accent: #00e5a0;
-    --accent2: #0099ff;
-    --warn: #ff6b35;
-    --text: #e8eaf2;
-    --text2: #8a8fa8;
-    --text3: #4a4f68;
-    --radius: 12px;
-    --mono: 'Space Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
+    --bg:#0d0f14;--surface:#161820;--surface2:#1e2028;--border:#2a2d38;
+    --accent:#00e5a0;--accent2:#0099ff;--warn:#ff6b35;
+    --text:#e8eaf2;--text2:#8a8fa8;--text3:#4a4f68;
+    --radius:12px;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+  .app{display:flex;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;}
+  .header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;}
+  .header-logo{font-family:var(--mono);font-size:15px;color:var(--accent);letter-spacing:2px;}
+  .header-sub{font-size:11px;color:var(--text3);font-family:var(--mono);}
+  .content{flex:1;padding:16px;padding-bottom:90px;}
+  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
+  .nav-btn{flex:1;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:none;background:none;color:var(--text3);font-size:10px;font-family:var(--sans);transition:color .2s;}
+  .nav-btn.active{color:var(--accent);}
+  .nav-btn svg{width:22px;height:22px;}
+  .nav-btn.scan-btn{background:var(--accent);color:var(--bg);margin:6px 4px;border-radius:10px;}
+  .nav-btn.scan-btn svg{color:var(--bg);}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .card-title{font-size:13px;font-family:var(--mono);color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+  .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;font-family:var(--mono);}
+  .badge-green{background:rgba(0,229,160,.12);color:var(--accent);border:1px solid rgba(0,229,160,.25);}
+  .badge-blue{background:rgba(0,153,255,.12);color:var(--accent2);border:1px solid rgba(0,153,255,.25);}
+  .badge-orange{background:rgba(255,107,53,.12);color:var(--warn);border:1px solid rgba(255,107,53,.25);}
+  .badge-gray{background:rgba(138,143,168,.12);color:var(--text2);border:1px solid rgba(138,143,168,.2);}
+  .form-group{margin-bottom:14px;}
+  .form-label{display:block;font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;}
+  .form-input,.form-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:var(--sans);font-size:15px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+  .form-input:focus,.form-textarea:focus{border-color:var(--accent);}
+  .form-textarea{min-height:80px;resize:vertical;}
 
-  /* LAYOUT */
-  .app { display: flex; flex-direction: column; min-height: 100vh; max-width: 480px; margin: 0 auto; }
-  .header { padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
-  .header-logo { font-family: var(--mono); font-size: 15px; color: var(--accent); letter-spacing: 2px; }
-  .header-sub { font-size: 11px; color: var(--text3); font-family: var(--mono); }
-  .header-right { display: flex; gap: 10px; align-items: center; }
-  .content { flex: 1; padding: 16px; padding-bottom: 90px; }
-  .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; }
-  .nav-btn { flex: 1; padding: 12px 4px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; border: none; background: none; color: var(--text3); font-size: 10px; font-family: var(--sans); transition: color 0.2s; }
-  .nav-btn.active { color: var(--accent); }
-  .nav-btn svg { width: 22px; height: 22px; }
-  .nav-btn.scan-btn { background: var(--accent); color: var(--bg); border-radius: 0; margin: 6px 4px; border-radius: 10px; }
-  .nav-btn.scan-btn svg { color: var(--bg); }
+  /* SMART DROPDOWN */
+  .sd-wrap{position:relative;}
+  .sd-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 36px 11px 14px;color:var(--text);font-family:var(--sans);font-size:15px;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s;min-height:46px;}
+  .sd-btn.open,.sd-btn:focus{border-color:var(--accent);outline:none;}
+  .sd-placeholder{color:var(--text3);}
+  .sd-menu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-radius:10px;z-index:500;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .sd-list{max-height:220px;overflow-y:auto;}
+  .sd-opt{padding:12px 14px;cursor:pointer;font-size:15px;display:flex;align-items:center;gap:10px;transition:background .1s;}
+  .sd-opt:hover,.sd-opt.sel{background:rgba(0,229,160,.08);}
+  .sd-opt.sel{color:var(--accent);}
+  .sd-add{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:var(--surface2);}
+  .sd-add-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;}
+  .sd-add-input:focus{border-color:var(--accent);}
+  .sd-add-btn{background:var(--accent);color:var(--bg);border:none;border-radius:6px;padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;}
 
-  /* CARDS */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .card-title { font-size: 13px; font-family: var(--mono); color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+  /* SERIAL CONFIRM */
+  .sn-confirm{background:var(--surface2);border:2px solid var(--accent);border-radius:var(--radius);padding:24px 20px;text-align:center;margin-bottom:16px;}
+  .sn-code{font-family:var(--mono);font-size:17px;color:var(--accent);margin:14px 0;word-break:break-all;background:var(--bg);padding:12px;border-radius:8px;}
+  .sn-q{font-size:15px;color:var(--text);margin-bottom:16px;}
+  .sn-btns{display:flex;gap:10px;}
 
-  /* BADGES */
-  .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; font-family: var(--mono); }
-  .badge-green { background: rgba(0,229,160,0.12); color: var(--accent); border: 1px solid rgba(0,229,160,0.25); }
-  .badge-blue { background: rgba(0,153,255,0.12); color: var(--accent2); border: 1px solid rgba(0,153,255,0.25); }
-  .badge-orange { background: rgba(255,107,53,0.12); color: var(--warn); border: 1px solid rgba(255,107,53,0.25); }
-  .badge-gray { background: rgba(138,143,168,0.12); color: var(--text2); border: 1px solid rgba(138,143,168,0.2); }
-
-  /* INPUTS */
-  .form-group { margin-bottom: 14px; }
-  .form-label { display: block; font-size: 11px; color: var(--text2); font-family: var(--mono); letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase; }
-  .form-input, .form-select, .form-textarea {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 11px 14px; color: var(--text); font-family: var(--sans); font-size: 15px;
-    outline: none; transition: border-color 0.2s; -webkit-appearance: none; appearance: none;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
-  .form-textarea { min-height: 80px; resize: vertical; }
-  .form-select option { background: var(--surface2); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-  /* BUTTONS */
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: var(--sans); }
-  .btn-primary { background: var(--accent); color: var(--bg); }
-  .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
-  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-danger { background: rgba(255,107,53,0.15); color: var(--warn); border: 1px solid rgba(255,107,53,0.3); }
-  .btn-full { width: 100%; }
-  .btn-sm { padding: 8px 14px; font-size: 13px; }
-  .btn-icon { width: 38px; height: 38px; padding: 0; border-radius: 8px; }
-
-  /* SCANNER */
-  .scanner-wrap { position: relative; border-radius: var(--radius); overflow: hidden; background: #000; aspect-ratio: 1; }
-  #qr-reader { width: 100% !important; }
-  #qr-reader video { border-radius: var(--radius); }
-  #qr-reader > div { border: none !important; }
-  .scan-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
-  .scan-frame { width: 86%; height: 110px; border: 2px solid var(--accent); border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); }
-  .scan-frame::before, .scan-frame::after { content: ''; position: absolute; width: 20px; height: 20px; border-color: var(--accent); border-style: solid; }
-  .scan-pulse { animation: pulse 1.5s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-  .scan-status { text-align: center; padding: 12px; font-family: var(--mono); font-size: 13px; color: var(--text2); }
-
-  /* ASSET LIST */
-  .asset-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s; }
-  .asset-item:active { border-color: var(--accent); }
-  .asset-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .asset-info { flex: 1; min-width: 0; }
-  .asset-name { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .asset-meta { font-size: 12px; color: var(--text2); margin-top: 3px; font-family: var(--mono); }
-  .asset-arrow { color: var(--text3); }
-
-  /* DETAIL VIEW */
-  .detail-header { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
-  .detail-icon { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
-  .detail-title { font-size: 20px; font-weight: 600; }
-  .detail-code { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-top: 4px; }
-  .field-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .field-row:last-child { border-bottom: none; }
-  .field-key { font-size: 12px; color: var(--text2); font-family: var(--mono); }
-  .field-val { font-size: 14px; color: var(--text); text-align: right; max-width: 60%; }
-
-  /* DASHBOARD */
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
-  .stat-num { font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700; }
-  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
-
-  /* SEARCH */
-  .search-bar { position: relative; margin-bottom: 14px; }
-  .search-bar input { padding-left: 40px; }
-  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); }
-
-  /* MODAL */
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: flex-end; }
-  .modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px; }
-  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
-
-  /* TOAST */
-  .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--bg); padding: 10px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 300; font-family: var(--mono); animation: toastIn 0.3s ease; }
-  @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-
-  /* EXPORT SECTION */
-  .export-box { background: var(--surface2); border: 1px dashed var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
-  .export-icon { font-size: 36px; margin-bottom: 8px; }
-  .queue-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface2); border-radius: 8px; margin-bottom: 8px; }
-  .queue-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); animation: pulse 1s infinite; }
-
-  /* EMPTY STATE */
-  .empty { text-align: center; padding: 48px 20px; color: var(--text3); }
-  .empty-icon { font-size: 48px; margin-bottom: 12px; }
-  .empty-text { font-size: 15px; margin-bottom: 6px; color: var(--text2); }
-  .empty-sub { font-size: 13px; }
-
-  /* FILTER CHIPS */
-  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip { white-space: nowrap; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text2); transition: all 0.15s; }
-  .chip.active { background: rgba(0,229,160,0.12); color: var(--accent); border-color: rgba(0,229,160,0.3); }
-
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
-  .section-title { font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--sans);}
+  .btn-primary{background:var(--accent);color:var(--bg);}
+  .btn-primary:active{opacity:.85;transform:scale(.98);}
+  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+  .btn-danger{background:rgba(255,107,53,.15);color:var(--warn);border:1px solid rgba(255,107,53,.3);}
+  .btn-full{width:100%;}
+  .btn-sm{padding:8px 14px;font-size:13px;}
+  .scanner-wrap{border-radius:var(--radius);overflow:hidden;background:#000;aspect-ratio:1;}
+  #qr-reader{width:100%!important;}
+  #qr-reader>div{border:none!important;}
+  .scan-status{text-align:center;padding:12px;font-family:var(--mono);font-size:13px;color:var(--text2);}
+  .scan-pulse{animation:pulse 1.5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .asset-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+  .asset-item:active{border-color:var(--accent);}
+  .asset-icon{width:44px;height:44px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .asset-info{flex:1;min-width:0;}
+  .asset-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .asset-meta{font-size:12px;color:var(--text2);margin-top:3px;font-family:var(--mono);}
+  .field-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+  .field-row:last-child{border-bottom:none;}
+  .field-key{font-size:12px;color:var(--text2);font-family:var(--mono);}
+  .field-val{font-size:14px;color:var(--text);text-align:right;max-width:65%;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+  .stat-num{font-family:var(--mono);font-size:28px;color:var(--accent);font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text2);margin-top:4px;}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{white-space:nowrap;padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;}
+  .chip.active{background:rgba(0,229,160,.12);color:var(--accent);border-color:rgba(0,229,160,.3);}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;}
+  .modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px;}
+  .modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+  .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--bg);padding:10px 20px;border-radius:30px;font-size:14px;font-weight:600;z-index:300;font-family:var(--mono);animation:toastIn .3s ease;white-space:nowrap;}
+  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  .queue-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface2);border-radius:8px;margin-bottom:8px;}
+  .queue-dot{width:8px;height:8px;border-radius:50%;background:var(--warn);animation:pulse 1s infinite;}
+  .empty{text-align:center;padding:48px 20px;color:var(--text3);}
+  .empty-icon{font-size:48px;margin-bottom:12px;}
+  .empty-text{font-size:15px;margin-bottom:6px;color:var(--text2);}
+  .export-box{background:var(--surface2);border:1px dashed var(--border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
-
-// ─── STORAGE ────────────────────────────────────────────────────────────────
-const DB = {
-  get: (k, def = []) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
-  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+const {useState,useEffect,useRef,useCallback}=React;
+const DB={
+  get:(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}},
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
 };
+const uuid=()=>crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2);
+const now=()=>new Date().toISOString();
 
-const ASSETS_KEY = 'assetscan_assets';
-const LOCATIONS_KEY = 'assetscan_locations';
-const ENTITIES_KEY = 'assetscan_entities';
-const QUEUE_KEY = 'assetscan_queue';
-
-const uuid = () => crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
-const now = () => new Date().toISOString();
-
-// ─── SEED DATA ───────────────────────────────────────────────────────────────
-const SEED_ENTITIES = [
-  { id: 'e1', code: 'ETUC', name: 'ETUC — Confédération Européenne', color: '#00e5a0' },
-  { id: 'e2', code: 'ETUI', name: 'ETUI — Institut Syndical Européen', color: '#0099ff' },
-  { id: 'e3', code: 'EFFAT', name: 'EFFAT', color: '#ff6b35' },
+const DEF_ENTITIES=[
+  {id:'e1',code:'ETUC',name:'ETUC — Confédération Européenne',color:'#00e5a0'},
+  {id:'e2',code:'ETUI',name:'ETUI — Institut Syndical Européen',color:'#0099ff'},
+  {id:'e3',code:'EFFAT',name:'EFFAT',color:'#ff6b35'},
 ];
-const SEED_LOCATIONS = [
-  { id: 'l1', name: 'BD du Roi Albert II — Bât A', parent: null },
-  { id: 'l2', name: 'Salle serveurs', parent: 'l1' },
-  { id: 'l3', name: 'Open space 3e étage', parent: 'l1' },
-  { id: 'l4', name: 'Salle de réunion B12', parent: 'l1' },
+const DEF_CATS=['Ordinateur portable','Ordinateur fixe','Écran','Téléphone mobile','Tablette','Imprimante','Switch réseau','Serveur','Clavier / Souris','Autre'];
+const DEF_BRANDS=['Dell','HP','Lenovo','Apple','Samsung','Xiaomi','Acer','Asus','Cisco','LG','BenQ','Logitech','Microsoft','Autre'];
+const DEF_STATUS=['En service','En stock','En réparation','Réformé'];
+const DEF_COND=['Neuf','Bon état','Correct','Dégradé'];
+const DEF_LOCS=[
+  {id:'l1',name:'Bd du Roi Albert II — Bât A'},
+  {id:'l2',name:'Salle serveurs'},
+  {id:'l3',name:'Open space 3e étage'},
+  {id:'l4',name:'Salle de réunion B12'},
 ];
-const SEED_ASSETS = [
-  { id: 'a1', code: 'SN-HP-20241001', code_type: 'manual', label: 'Laptop HP EliteBook 840', brand: 'HP', model: 'EliteBook 840 G10', serial: 'CZC4123XYZ', category: 'IT', status: 'In use', condition: 'Good', entity_id: 'e1', location_id: 'l3', location_detail: 'Bureau 3-12', assigned_to: 'Sophie Renard', assigned_date: '2024-01-15', notes: 'Windows 11 Pro, Bitlocker actif', manufacturer_url: 'https://support.hp.com', manufacturer_data: null, photos: [], scrape_queued: false, created_at: now(), updated_at: now(), synced: false },
-  { id: 'a2', code: '4719543771329', code_type: 'EAN13', label: 'Switch Cisco SG350-28', brand: 'Cisco', model: 'SG350-28', serial: 'FTX2201B3KL', category: 'IT', status: 'In use', condition: 'New', entity_id: 'e1', location_id: 'l2', location_detail: 'Rack U12', assigned_to: null, assigned_date: null, notes: '28 ports, VLAN configuré', manufacturer_url: 'https://www.cisco.com', manufacturer_data: null, photos: [], scrape_queued: true, created_at: now(), updated_at: now(), synced: false },
+const SEED=[
+  {id:'a1',serial:'CZC4123XYZ',label:'EliteBook 840 G10',brand:'HP',category:'Ordinateur portable',status:'En service',condition:'Bon état',entity_id:'e1',location_id:'l3',location_detail:'Bureau 3-12',assigned_to:'Sophie Renard',notes:'',manufacturer_url:'https://support.hp.com',manufacturer_data:null,scrape_queued:false,created_at:now(),updated_at:now(),synced:false},
+  {id:'a2',serial:'FTX2201B3KL',label:'SG350-28',brand:'Cisco',category:'Switch réseau',status:'En service',condition:'Neuf',entity_id:'e1',location_id:'l2',location_detail:'Rack U12',assigned_to:'',notes:'28 ports VLAN',manufacturer_url:'https://cisco.com',manufacturer_data:null,scrape_queued:true,created_at:now(),updated_at:now(),synced:false},
 ];
 
-function initDB() {
-  if (!localStorage.getItem(ENTITIES_KEY)) DB.set(ENTITIES_KEY, SEED_ENTITIES);
-  if (!localStorage.getItem(LOCATIONS_KEY)) DB.set(LOCATIONS_KEY, SEED_LOCATIONS);
-  if (!localStorage.getItem(ASSETS_KEY)) DB.set(ASSETS_KEY, SEED_ASSETS);
-  if (!localStorage.getItem(QUEUE_KEY)) DB.set(QUEUE_KEY, []);
+function initDB(){
+  if(!DB.get('sc_entities',null))DB.set('sc_entities',DEF_ENTITIES);
+  if(!DB.get('sc_cats',null))DB.set('sc_cats',DEF_CATS);
+  if(!DB.get('sc_brands',null))DB.set('sc_brands',DEF_BRANDS);
+  if(!DB.get('sc_status',null))DB.set('sc_status',DEF_STATUS);
+  if(!DB.get('sc_cond',null))DB.set('sc_cond',DEF_COND);
+  if(!DB.get('sc_locs',null))DB.set('sc_locs',DEF_LOCS);
+  if(!DB.get('sc_assets',null))DB.set('sc_assets',SEED);
+  if(!DB.get('sc_queue',null))DB.set('sc_queue',[]);
 }
 
-// ─── ICONS ───────────────────────────────────────────────────────────────────
-const Icon = ({ name, size = 20 }) => {
-  const icons = {
-    scan: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>,
-    list: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>,
-    home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    export: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
-    plus: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width={size} height={size}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-    edit: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
-    trash: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
-    back: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><polyline points="15 18 9 12 15 6"/></svg>,
-    check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><polyline points="20 6 9 17 4 12"/></svg>,
-    search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-    clock: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-    arrow: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><polyline points="9 18 15 12 9 6"/></svg>,
+const EMOJI={
+  'Ordinateur portable':'💻','Ordinateur fixe':'🖥️','Écran':'🖥️',
+  'Téléphone mobile':'📱','Tablette':'📲','Imprimante':'🖨️',
+  'Switch réseau':'🔌','Serveur':'🗄️','Clavier / Souris':'⌨️','Autre':'📦'
+};
+const SBADGE={'En service':'badge-green','En stock':'badge-blue','En réparation':'badge-orange','Réformé':'badge-gray'};
+
+// ICONS
+const Icon=({name,size=20})=>{
+  const d={
+    scan:"M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10",
+    list:"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
+    home:"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10",
+    export:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
+    plus:"M12 5v14M5 12h14",edit:"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z",
+    trash:"M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6",
+    back:"M15 18l-6-6 6-6",check:"M20 6L9 17l-5-5",search:"M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z",
+    arrow:"M9 18l6-6-6-6",
   };
-  return icons[name] || null;
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}><path d={d[name]}/></svg>;
 };
 
-const CATEGORY_EMOJI = { IT: '💻', Furniture: '🪑', AV: '📺', Vehicle: '🚗', Mobile: '📱', Network: '🔌', Other: '📦' };
-const STATUS_BADGE = { 'In use': 'badge-green', 'In stock': 'badge-blue', 'Under repair': 'badge-orange', 'Decommissioned': 'badge-gray' };
-const STATUS_FR = { 'In use': 'En service', 'In stock': 'En stock', 'Under repair': 'En réparation', 'Decommissioned': 'Réformé' };
-const CONDITION_FR = { New: 'Neuf', Good: 'Bon état', Fair: 'Correct', Poor: 'Dégradé' };
-
-// ─── TOAST ───────────────────────────────────────────────────────────────────
-function Toast({ msg, onDone }) {
-  useEffect(() => { const t = setTimeout(onDone, 2200); return () => clearTimeout(t); }, []);
+// TOAST
+function Toast({msg,onDone}){
+  useEffect(()=>{const t=setTimeout(onDone,2200);return()=>clearTimeout(t);},[]);
   return <div className="toast">{msg}</div>;
 }
 
-// ─── SCANNER SCREEN ──────────────────────────────────────────────────────────
-const NATIVE_FORMATS = ['aztec','code_39','code_93','code_128','codabar','data_matrix','ean_8','ean_13','pdf417','qr_code','upc_a','upc_e'];
-
-function ScanScreen({ onScanned }) {
-  const [scanning, setScanning] = useState(false);
-  const [manual, setManual] = useState('');
-  const [error, setError] = useState('');
-  const [useNative] = useState(() => 'BarcodeDetector' in window);
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  const rafRef = useRef(null);
-  const html5Ref = useRef(null);
-
-  // ── Native BarcodeDetector (Android Chrome / Samsung Browser)
-  const startNativeScan = useCallback(async () => {
-    setError('');
-    setScanning(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-      });
-      streamRef.current = stream;
-      // wait for videoRef to be rendered
-      await new Promise(r => setTimeout(r, 100));
-      if (!videoRef.current) return;
-      videoRef.current.srcObject = stream;
-      await videoRef.current.play();
-      const detector = new BarcodeDetector({ formats: NATIVE_FORMATS });
-      const scan = async () => {
-        if (!streamRef.current || !videoRef.current) return;
-        try {
-          const codes = await detector.detect(videoRef.current);
-          if (codes.length > 0) {
-            if (navigator.vibrate) navigator.vibrate(80);
-            const { rawValue, format } = codes[0];
-            stopNativeScan();
-            onScanned(rawValue, format);
-            return;
-          }
-        } catch {}
-        rafRef.current = requestAnimationFrame(scan);
-      };
-      rafRef.current = requestAnimationFrame(scan);
-    } catch {
-      setError('Caméra inaccessible. Utilisez la saisie manuelle.');
-      setScanning(false);
-    }
-  }, [onScanned]);
-
-  const stopNativeScan = useCallback(() => {
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
-    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
-    if (videoRef.current) videoRef.current.srcObject = null;
-    setScanning(false);
-  }, []);
-
-  // ── html5-qrcode fallback (autres navigateurs)
-  const startHtml5Scan = useCallback(async () => {
-    setError('');
-    setScanning(true);
-    try {
-      await new Promise(r => setTimeout(r, 300));
-      const f = Html5QrcodeSupportedFormats;
-      const scanner = new Html5Qrcode('qr-reader', {
-        formatsToSupport: [f.QR_CODE, f.CODE_39, f.CODE_93, f.CODE_128, f.DATA_MATRIX, f.EAN_13, f.EAN_8, f.PDF_417, f.UPC_A, f.UPC_E, f.AZTEC]
-      });
-      html5Ref.current = scanner;
-      await scanner.start(
-        { facingMode: 'environment' },
-        { fps: 15, qrbox: { width: 260, height: 100 } },
-        (decoded, result) => {
-          const fmt = result?.result?.format?.formatName || 'barcode';
-          if (navigator.vibrate) navigator.vibrate(80);
-          stopHtml5Scan();
-          onScanned(decoded, fmt);
-        },
-        () => {}
-      );
-    } catch {
-      setError('Caméra inaccessible. Utilisez la saisie manuelle.');
-      setScanning(false);
-    }
-  }, [onScanned]);
-
-  const stopHtml5Scan = useCallback(async () => {
-    try { if (html5Ref.current) { await html5Ref.current.stop(); html5Ref.current = null; } } catch {}
-    setScanning(false);
-  }, []);
-
-  const startScan = useNative ? startNativeScan : startHtml5Scan;
-  const stopScan  = useNative ? stopNativeScan  : stopHtml5Scan;
-
-  useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
-    try { html5Ref.current?.stop(); } catch {}
-  }, []);
-
-  return (
-    <div>
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div className="card-title" style={{ marginBottom: 14 }}>📷 Scanner un code</div>
-        {!scanning ? (
-          <button className="btn btn-primary btn-full" style={{ fontSize: 16, padding: '14px' }} onClick={startScan}>
-            <Icon name="scan" /> Activer la caméra
-          </button>
-        ) : (
-          <>
-            <div className="scanner-wrap">
-              {useNative
-                ? <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', display: 'block', borderRadius: 'var(--radius)' }} />
-                : <div id="qr-reader" style={{ width: '100%' }}></div>
-              }
-              <div className="scan-overlay"><div className="scan-frame scan-pulse" /></div>
-            </div>
-            <div className="scan-status scan-pulse">⬡ Alignez le code-barres dans le cadre — étiquette Dell, EAN, QR…</div>
-            <button className="btn btn-secondary btn-full" style={{ marginTop: 10 }} onClick={stopScan}>Arrêter</button>
-          </>
-        )}
-        {error && <div style={{ color: 'var(--warn)', fontSize: 13, marginTop: 10, textAlign: 'center' }}>{error}</div>}
-      </div>
-
-      <div className="card">
-        <div className="card-title" style={{ marginBottom: 12 }}>⌨️ Saisie manuelle</div>
-        <div className="form-group">
-          <input className="form-input" placeholder="Service Tag Dell (ex: FKM9L33)…" value={manual} onChange={e => setManual(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && manual.trim()) { onScanned(manual.trim(), 'manual'); setManual(''); } }} />
+// SMART SELECT
+function SmartSelect({label,value,options,onChange,onAdd,placeholder='Sélectionner…',showEmoji=false}){
+  const [open,setOpen]=useState(false);
+  const [newVal,setNewVal]=useState('');
+  const ref=useRef();
+  useEffect(()=>{
+    const h=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
+    document.addEventListener('mousedown',h);
+    return()=>document.removeEventListener('mousedown',h);
+  },[]);
+  const doAdd=()=>{
+    const v=newVal.trim();if(!v)return;
+    onAdd(v);onChange(v);setNewVal('');setOpen(false);
+  };
+  const chevron=<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={16} height={16} style={{transform:open?'rotate(180deg)':'none',transition:'.2s',flexShrink:0}}><polyline points="6 9 12 15 18 9"/></svg>;
+  return(
+    <div className="sd-wrap" ref={ref}>
+      {label&&<label className="form-label">{label}</label>}
+      <button type="button" className={`sd-btn${open?' open':''}`} onClick={()=>setOpen(o=>!o)}>
+        <span>{value?<span>{showEmoji?(EMOJI[value]||'📦')+' ':''}{value}</span>:<span className="sd-placeholder">{placeholder}</span>}</span>
+        {chevron}
+      </button>
+      {open&&(
+        <div className="sd-menu">
+          <div className="sd-list">
+            {options.map(opt=>(
+              <div key={opt} className={`sd-opt${value===opt?' sel':''}`} onClick={()=>{onChange(opt);setOpen(false);}}>
+                {showEmoji&&<span>{EMOJI[opt]||'📦'}</span>}
+                <span>{opt}</span>
+                {value===opt&&<span style={{marginLeft:'auto',color:'var(--accent)'}}>✓</span>}
+              </div>
+            ))}
+          </div>
+          <div className="sd-add">
+            <input className="sd-add-input" placeholder="Ajouter une option…" value={newVal}
+              onChange={e=>setNewVal(e.target.value)} onKeyDown={e=>e.key==='Enter'&&doAdd()}/>
+            <button className="sd-add-btn" onClick={doAdd}>+ Ajouter</button>
+          </div>
         </div>
-        <button className="btn btn-primary btn-full" disabled={!manual.trim()}
-          onClick={() => { onScanned(manual.trim(), 'manual'); setManual(''); }}>
-          Valider
-        </button>
-      </div>
+      )}
+    </div>
+  );
+}
 
-      <div className="card" style={{ background: 'rgba(0,229,160,0.04)', borderColor: 'rgba(0,229,160,0.15)' }}>
-        <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.6 }}>
-          <b style={{ color: 'var(--accent)' }}>Formats supportés</b><br />
-          <b style={{ color: 'var(--text)' }}>Code-barres :</b> Code 39 · Code 93 · Code 128 · EAN-13 · EAN-8 · UPC-A · UPC-E<br />
-          <b style={{ color: 'var(--text)' }}>2D :</b> QR Code · DataMatrix · Aztec · PDF417<br />
-          <span style={{ color: 'var(--text3)', fontSize: 12 }}>✓ Service Tag Dell (Code 39) · {useNative ? '⚡ Moteur natif Android actif' : '🔄 Moteur de secours actif'}</span>
-        </div>
+// SERIAL CONFIRM
+function SerialConfirm({code,onYes,onNo}){
+  return(
+    <div className="sn-confirm">
+      <div style={{fontSize:36,marginBottom:8}}>🔍</div>
+      <div className="sn-q">Ce code scanné est-il le <b>numéro de série</b> de l'équipement ?</div>
+      <div className="sn-code">{code}</div>
+      <div className="sn-btns">
+        <button className="btn btn-secondary" style={{flex:1}} onClick={onNo}>Non — autre chose</button>
+        <button className="btn btn-primary" style={{flex:1}} onClick={()=>onYes(code)}><Icon name="check" size={16}/> Oui, c'est le S/N</button>
       </div>
     </div>
   );
 }
 
-// ─── ASSET FORM ───────────────────────────────────────────────────────────────
-function AssetForm({ initial, entities, locations, onSave, onCancel }) {
-  const [form, setForm] = useState(() => ({
-    code: '', code_type: 'manual', label: '', brand: '', model: '', serial: '',
-    category: 'IT', status: 'In use', condition: 'Good',
-    entity_id: entities[0]?.id || '',
-    location_id: locations[0]?.id || '', location_detail: '',
-    assigned_to: '', assigned_date: '',
-    notes: '', manufacturer_url: '',
-    ...initial
-  }));
-
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  return (
+// SCAN SCREEN
+function ScanScreen({onScanned}){
+  const [scanning,setScanning]=useState(false);
+  const [manual,setManual]=useState('');
+  const [error,setError]=useState('');
+  const html5Ref=useRef(null);
+  const startScan=useCallback(async()=>{
+    setError('');setScanning(true);
+    try{
+      await new Promise(r=>setTimeout(r,300));
+      const s=new Html5Qrcode('qr-reader');html5Ref.current=s;
+      await s.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},
+        decoded=>{if(navigator.vibrate)navigator.vibrate(80);stopScan();onScanned(decoded.trim());},
+        ()=>{}
+      );
+    }catch{setError('Caméra inaccessible — utilisez la saisie manuelle.');setScanning(false);}
+  },[onScanned]);
+  const stopScan=useCallback(async()=>{
+    try{if(html5Ref.current){await html5Ref.current.stop();html5Ref.current=null;}}catch{}
+    setScanning(false);
+  },[]);
+  useEffect(()=>()=>{try{html5Ref.current?.stop();}catch{}},[]);
+  return(
     <div>
       <div className="card">
-        <div className="card-title" style={{ marginBottom: 14 }}>Identification</div>
-        <div className="form-group">
-          <label className="form-label">Code scanné / S/N</label>
-          <input className="form-input" value={form.code} onChange={e => set('code', e.target.value)} placeholder="ex: SN-HP-20241001" />
+        <div className="card-title">📷 Scanner un code</div>
+        {!scanning
+          ?<button className="btn btn-primary btn-full" style={{fontSize:16,padding:14}} onClick={startScan}><Icon name="scan"/> Activer la caméra</button>
+          :<><div className="scanner-wrap"><div id="qr-reader" style={{width:'100%'}}/></div>
+            <div className="scan-status scan-pulse">⬡ Pointez vers un QR code ou code-barres</div>
+            <button className="btn btn-secondary btn-full" style={{marginTop:10}} onClick={stopScan}>Arrêter</button></>
+        }
+        {error&&<div style={{color:'var(--warn)',fontSize:13,marginTop:10,textAlign:'center'}}>{error}</div>}
+      </div>
+      <div className="card">
+        <div className="card-title">⌨️ Saisie manuelle</div>
+        <div className="form-group" style={{marginBottom:10}}>
+          <input className="form-input" placeholder="Numéro de série, code asset…" value={manual}
+            onChange={e=>setManual(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter'&&manual.trim()){onScanned(manual.trim());setManual('');}}}/>
         </div>
+        <button className="btn btn-primary btn-full" disabled={!manual.trim()}
+          onClick={()=>{onScanned(manual.trim());setManual('');}}>Valider</button>
+      </div>
+    </div>
+  );
+}
+
+// ASSET FORM
+function AssetForm({initial,entities,locations,lists,onAddToList,onSave,onCancel}){
+  const {cats,brands,statuses,conds}=lists;
+  const [form,setForm]=useState(()=>({
+    serial:'',label:'',brand:brands[0]||'Dell',category:cats[0]||'',
+    status:statuses[0]||'En service',condition:conds[0]||'Bon état',
+    entity_id:entities[0]?.id||'',location_id:'',location_detail:'',
+    assigned_to:'',notes:'',manufacturer_url:'',
+    ...initial
+  }));
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const entityObj=entities.find(e=>e.id===form.entity_id);
+  const locationObj=locations.find(l=>l.id===form.location_id);
+
+  return(
+    <div>
+      {/* S/N */}
+      <div className="card">
+        <div className="card-title">Numéro de série</div>
         <div className="form-group">
-          <label className="form-label">Type de code</label>
-          <select className="form-select" value={form.code_type} onChange={e => set('code_type', e.target.value)}>
-            {['QR', 'EAN13', 'EAN8', 'Code128', 'UPC', 'DataMatrix', 'NFC', 'manual'].map(t => <option key={t}>{t}</option>)}
-          </select>
-        </div>
-        <div className="form-group">
-          <label className="form-label">Libellé *</label>
-          <input className="form-input" value={form.label} onChange={e => set('label', e.target.value)} placeholder="ex: Laptop HP EliteBook 840" />
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Marque</label>
-            <input className="form-input" value={form.brand} onChange={e => set('brand', e.target.value)} placeholder="HP, Dell…" />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Modèle</label>
-            <input className="form-input" value={form.model} onChange={e => set('model', e.target.value)} placeholder="EliteBook 840" />
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="form-label">Numéro de série</label>
-          <input className="form-input" value={form.serial} onChange={e => set('serial', e.target.value)} placeholder="CZC4123XYZ" />
+          <label className="form-label">S/N</label>
+          <input className="form-input" value={form.serial} onChange={e=>set('serial',e.target.value)}
+            placeholder="ex: CZC4123XYZ" style={{fontFamily:'var(--mono)',letterSpacing:1}}/>
         </div>
       </div>
-
+      {/* CLASSIFICATION */}
       <div className="card">
-        <div className="card-title" style={{ marginBottom: 14 }}>Classification</div>
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Catégorie</label>
-            <select className="form-select" value={form.category} onChange={e => set('category', e.target.value)}>
-              {Object.keys(CATEGORY_EMOJI).map(c => <option key={c}>{c}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Statut</label>
-            <select className="form-select" value={form.status} onChange={e => set('status', e.target.value)}>
-              {Object.keys(STATUS_FR).map(s => <option key={s} value={s}>{STATUS_FR[s]}</option>)}
-            </select>
-          </div>
+        <div className="card-title">Classification</div>
+        <div className="form-group">
+          <SmartSelect label="Entité *"
+            value={entityObj?`${entityObj.code} — ${entityObj.name}`:''}
+            options={entities.map(e=>`${e.code} — ${e.name}`)}
+            onChange={v=>{const e=entities.find(e=>`${e.code} — ${e.name}`===v);if(e)set('entity_id',e.id);}}
+            onAdd={v=>{const ne={id:uuid(),code:v.split(' ')[0]||v,name:v,color:'#8a8fa8'};onAddToList('entities',ne);}}
+            placeholder="Sélectionner une entité…"/>
         </div>
         <div className="form-group">
-          <label className="form-label">État</label>
-          <select className="form-select" value={form.condition} onChange={e => set('condition', e.target.value)}>
-            {Object.keys(CONDITION_FR).map(c => <option key={c} value={c}>{CONDITION_FR[c]}</option>)}
-          </select>
+          <SmartSelect label="Type d'équipement *" value={form.category}
+            options={cats} onChange={v=>set('category',v)}
+            onAdd={v=>onAddToList('cats',v)}
+            placeholder="Ordinateur, écran, téléphone…" showEmoji={true}/>
         </div>
         <div className="form-group">
-          <label className="form-label">Entité *</label>
-          <select className="form-select" value={form.entity_id} onChange={e => set('entity_id', e.target.value)}>
-            {entities.map(e => <option key={e.id} value={e.id}>{e.code} — {e.name}</option>)}
-          </select>
+          <SmartSelect label="Marque *" value={form.brand}
+            options={brands} onChange={v=>set('brand',v)}
+            onAdd={v=>onAddToList('brands',v)}
+            placeholder="Dell, HP, Xiaomi…"/>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Modèle</label>
+          <input className="form-input" value={form.label} onChange={e=>set('label',e.target.value)}
+            placeholder="ex: Latitude 5540, EliteBook 840…"/>
         </div>
       </div>
-
+      {/* ÉTAT */}
       <div className="card">
-        <div className="card-title" style={{ marginBottom: 14 }}>Localisation & Affectation</div>
+        <div className="card-title">État & Statut</div>
         <div className="form-group">
-          <label className="form-label">Emplacement</label>
-          <select className="form-select" value={form.location_id} onChange={e => set('location_id', e.target.value)}>
-            <option value="">— Non assigné —</option>
-            {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-          </select>
+          <SmartSelect label="Statut" value={form.status}
+            options={statuses} onChange={v=>set('status',v)}
+            onAdd={v=>onAddToList('statuses',v)}/>
+        </div>
+        <div className="form-group">
+          <SmartSelect label="Condition" value={form.condition}
+            options={conds} onChange={v=>set('condition',v)}
+            onAdd={v=>onAddToList('conds',v)}/>
+        </div>
+      </div>
+      {/* LOCALISATION */}
+      <div className="card">
+        <div className="card-title">Localisation & Affectation</div>
+        <div className="form-group">
+          <SmartSelect label="Emplacement" value={locationObj?.name||''}
+            options={locations.map(l=>l.name)}
+            onChange={v=>{const l=locations.find(l=>l.name===v);set('location_id',l?.id||'');}}
+            onAdd={v=>{const nl={id:uuid(),name:v};onAddToList('locs',nl);set('location_id',nl.id);}}
+            placeholder="Sélectionner un emplacement…"/>
         </div>
         <div className="form-group">
           <label className="form-label">Détail emplacement</label>
-          <input className="form-input" value={form.location_detail} onChange={e => set('location_detail', e.target.value)} placeholder="Bureau 3-12, Rack U4…" />
+          <input className="form-input" value={form.location_detail} onChange={e=>set('location_detail',e.target.value)}
+            placeholder="Bureau 3-12, Rack U4…"/>
         </div>
         <div className="form-group">
           <label className="form-label">Utilisateur / Responsable</label>
-          <input className="form-input" value={form.assigned_to} onChange={e => set('assigned_to', e.target.value)} placeholder="Prénom NOM ou email" />
-        </div>
-        <div className="form-group">
-          <label className="form-label">Date d'affectation</label>
-          <input className="form-input" type="date" value={form.assigned_date} onChange={e => set('assigned_date', e.target.value)} />
+          <input className="form-input" value={form.assigned_to} onChange={e=>set('assigned_to',e.target.value)}
+            placeholder="Prénom NOM"/>
         </div>
       </div>
-
+      {/* NOTES */}
       <div className="card">
-        <div className="card-title" style={{ marginBottom: 14 }}>Notes & Constructeur</div>
-        <div className="form-group">
-          <label className="form-label">Notes / État des lieux</label>
-          <textarea className="form-textarea" value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Observations, anomalies, configuration particulière…" />
-        </div>
-        <div className="form-group">
-          <label className="form-label">URL Constructeur</label>
-          <input className="form-input" value={form.manufacturer_url} onChange={e => set('manufacturer_url', e.target.value)} placeholder="https://support.hp.com/…" type="url" />
-        </div>
-        <div style={{ background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.2)', borderRadius: 8, padding: 12, fontSize: 13, color: 'var(--text2)' }}>
-          🕷️ <b style={{ color: 'var(--warn)' }}>Phase 2 — Playwright</b><br />
-          Les infos constructeur seront récupérées automatiquement via un script PC. L'asset sera ajouté à la file d'attente après sauvegarde.
+        <div className="card-title">Notes</div>
+        <div className="form-group" style={{marginBottom:0}}>
+          <textarea className="form-textarea" value={form.notes} onChange={e=>set('notes',e.target.value)}
+            placeholder="Observations, anomalies, config particulière…"/>
         </div>
       </div>
-
-      <div style={{ display: 'flex', gap: 10, paddingBottom: 8 }}>
-        <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onCancel}>Annuler</button>
-        <button className="btn btn-primary" style={{ flex: 2 }} disabled={!form.label.trim()}
-          onClick={() => onSave(form)}>
-          <Icon name="check" size={18} /> Enregistrer
+      {/* Phase 2 */}
+      <div className="card" style={{background:'rgba(255,107,53,.04)',borderColor:'rgba(255,107,53,.15)'}}>
+        <div className="card-title" style={{color:'var(--warn)'}}>🕷️ Phase 2 — Playwright</div>
+        <div className="form-group" style={{marginBottom:0}}>
+          <label className="form-label">URL Constructeur (optionnel)</label>
+          <input className="form-input" value={form.manufacturer_url||''} onChange={e=>set('manufacturer_url',e.target.value)}
+            placeholder="https://support.dell.com/…" type="url"/>
+        </div>
+      </div>
+      <div style={{display:'flex',gap:10,paddingBottom:8}}>
+        <button className="btn btn-secondary" style={{flex:1}} onClick={onCancel}>Annuler</button>
+        <button className="btn btn-primary" style={{flex:2}}
+          disabled={!form.category||!form.brand||!form.entity_id}
+          onClick={()=>onSave(form)}>
+          <Icon name="check" size={18}/> Enregistrer
         </button>
       </div>
     </div>
   );
 }
 
-// ─── ASSET DETAIL ─────────────────────────────────────────────────────────────
-function AssetDetail({ asset, entities, locations, onEdit, onDelete, onBack, onQueueScrape }) {
-  const entity = entities.find(e => e.id === asset.entity_id);
-  const location = locations.find(l => l.id === asset.location_id);
-  const [confirmDel, setConfirmDel] = useState(false);
-
-  const rows = [
-    ['Code', <span style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>{asset.code}</span>],
-    ['Type code', asset.code_type],
-    ['Marque / Modèle', `${asset.brand || '—'} ${asset.model || ''}`],
-    ['Numéro de série', asset.serial || '—'],
-    ['Catégorie', asset.category],
-    ['Statut', <span className={`badge ${STATUS_BADGE[asset.status]}`}>{STATUS_FR[asset.status]}</span>],
-    ['État', CONDITION_FR[asset.condition] || asset.condition],
-    ['Entité', entity ? <span style={{ color: entity.color, fontWeight: 600 }}>{entity.code}</span> : '—'],
-    ['Emplacement', location ? location.name : '—'],
-    ['Détail', asset.location_detail || '—'],
-    ['Affecté à', asset.assigned_to || '—'],
-    ['Date affectation', asset.assigned_date || '—'],
-    ['URL Constructeur', asset.manufacturer_url ? <a href={asset.manufacturer_url} target="_blank" style={{ color: 'var(--accent2)', fontSize: 13 }}>🔗 Lien</a> : '—'],
-    ['Données constructeur', asset.manufacturer_data ? <span className="badge badge-green">Enrichi ✓</span> : <span className="badge badge-gray">En attente</span>],
-    ['Créé le', new Date(asset.created_at).toLocaleDateString('fr-BE')],
-    ['Modifié le', new Date(asset.updated_at).toLocaleDateString('fr-BE')],
+// ASSET DETAIL
+function AssetDetail({asset,entities,locations,onEdit,onDelete,onQueueScrape}){
+  const [confirmDel,setConfirmDel]=useState(false);
+  const entity=entities.find(e=>e.id===asset.entity_id);
+  const location=locations.find(l=>l.id===asset.location_id);
+  const rows=[
+    ['Numéro de série',<span style={{fontFamily:'var(--mono)',fontSize:13}}>{asset.serial||'—'}</span>],
+    ['Marque',asset.brand||'—'],['Modèle',asset.label||'—'],
+    ['Catégorie',`${EMOJI[asset.category]||'📦'} ${asset.category}`],
+    ['Statut',<span className={`badge ${SBADGE[asset.status]||'badge-gray'}`}>{asset.status}</span>],
+    ['État',asset.condition],
+    ['Entité',entity?<span style={{color:entity.color,fontWeight:600}}>{entity.code}</span>:'—'],
+    ['Emplacement',location?location.name:'—'],['Détail',asset.location_detail||'—'],
+    ['Affecté à',asset.assigned_to||'—'],
+    ['URL Constructeur',asset.manufacturer_url?<a href={asset.manufacturer_url} target="_blank" style={{color:'var(--accent2)',fontSize:13}}>🔗 Voir</a>:'—'],
+    ['Données constructeur',asset.manufacturer_data?<span className="badge badge-green">Enrichi ✓</span>:<span className="badge badge-gray">Non renseigné</span>],
+    ['Créé le',new Date(asset.created_at).toLocaleDateString('fr-BE')],
   ];
-
-  return (
+  return(
     <div>
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 20 }}>
-        <div className="detail-icon" style={{ background: 'var(--surface2)', fontSize: 28 }}>{CATEGORY_EMOJI[asset.category] || '📦'}</div>
+      <div style={{display:'flex',gap:14,alignItems:'flex-start',marginBottom:20}}>
+        <div style={{width:60,height:60,borderRadius:14,background:'var(--surface2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,flexShrink:0}}>
+          {EMOJI[asset.category]||'📦'}
+        </div>
         <div>
-          <div style={{ fontSize: 19, fontWeight: 600, lineHeight: 1.3 }}>{asset.label}</div>
-          <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text3)', marginTop: 4 }}>{asset.code}</div>
-          {entity && <div style={{ marginTop: 6 }}><span className="badge" style={{ background: `${entity.color}18`, color: entity.color, borderColor: `${entity.color}33` }}>{entity.code}</span></div>}
+          <div style={{fontSize:19,fontWeight:600}}>{asset.brand} {asset.label}</div>
+          <div style={{fontFamily:'var(--mono)',fontSize:11,color:'var(--text3)',marginTop:4}}>{asset.serial||'S/N non renseigné'}</div>
+          {entity&&<div style={{marginTop:6}}><span className="badge" style={{background:`${entity.color}18`,color:entity.color,borderColor:`${entity.color}33`}}>{entity.code}</span></div>}
         </div>
       </div>
-
-      {asset.notes && (
-        <div className="card" style={{ background: 'rgba(0,153,255,0.05)', borderColor: 'rgba(0,153,255,0.2)', marginBottom: 12 }}>
-          <div className="card-title" style={{ marginBottom: 8 }}>📝 Notes</div>
-          <div style={{ fontSize: 14, color: 'var(--text2)', lineHeight: 1.6 }}>{asset.notes}</div>
-        </div>
-      )}
-
-      <div className="card">
-        {rows.map(([k, v]) => (
-          <div key={k} className="field-row">
-            <span className="field-key">{k}</span>
-            <span className="field-val">{v}</span>
-          </div>
-        ))}
-      </div>
-
-      {!asset.scrape_queued && !asset.manufacturer_data && (
-        <button className="btn btn-secondary btn-full" style={{ marginBottom: 10, borderColor: 'rgba(255,107,53,0.3)' }}
-          onClick={() => onQueueScrape(asset.id)}>
+      {asset.notes&&<div className="card" style={{background:'rgba(0,153,255,.05)',borderColor:'rgba(0,153,255,.2)',marginBottom:12}}>
+        <div className="card-title">📝 Notes</div>
+        <div style={{fontSize:14,color:'var(--text2)',lineHeight:1.6}}>{asset.notes}</div>
+      </div>}
+      <div className="card">{rows.map(([k,v])=><div key={k} className="field-row"><span className="field-key">{k}</span><span className="field-val">{v}</span></div>)}</div>
+      {!asset.scrape_queued&&!asset.manufacturer_data&&(
+        <button className="btn btn-secondary btn-full" style={{marginBottom:10,borderColor:'rgba(255,107,53,.3)'}} onClick={()=>onQueueScrape(asset.id)}>
           🕷️ Ajouter à la file Playwright
         </button>
       )}
-      {asset.scrape_queued && !asset.manufacturer_data && (
-        <div style={{ textAlign: 'center', padding: '10px', color: 'var(--warn)', fontSize: 13, fontFamily: 'var(--mono)', marginBottom: 10 }}>
-          ⏳ En file d'attente Playwright
-        </div>
+      {asset.scrape_queued&&!asset.manufacturer_data&&(
+        <div style={{textAlign:'center',padding:10,color:'var(--warn)',fontSize:13,fontFamily:'var(--mono)',marginBottom:10}}>⏳ En file d'attente Playwright</div>
       )}
-
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmDel(true)}><Icon name="trash" size={16} /></button>
-        <button className="btn btn-primary" style={{ flex: 2 }} onClick={onEdit}><Icon name="edit" size={16} /> Modifier</button>
+      <div style={{display:'flex',gap:10}}>
+        <button className="btn btn-danger btn-sm" onClick={()=>setConfirmDel(true)}><Icon name="trash" size={16}/></button>
+        <button className="btn btn-primary" style={{flex:1}} onClick={onEdit}><Icon name="edit" size={16}/> Modifier</button>
       </div>
-
-      {confirmDel && (
-        <div className="modal-backdrop" onClick={() => setConfirmDel(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-handle" />
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
-              <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 8 }}>Supprimer cet asset ?</div>
-              <div style={{ fontSize: 14, color: 'var(--text2)' }}>Cette action est irréversible.</div>
+      {confirmDel&&(
+        <div className="modal-backdrop" onClick={()=>setConfirmDel(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-handle"/>
+            <div style={{textAlign:'center',marginBottom:20}}>
+              <div style={{fontSize:36,marginBottom:12}}>⚠️</div>
+              <div style={{fontSize:17,fontWeight:600,marginBottom:8}}>Supprimer cet asset ?</div>
+              <div style={{fontSize:14,color:'var(--text2)'}}>Cette action est irréversible.</div>
             </div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmDel(false)}>Annuler</button>
-              <button className="btn btn-danger" style={{ flex: 1 }} onClick={onDelete}>Supprimer</button>
+            <div style={{display:'flex',gap:10}}>
+              <button className="btn btn-secondary" style={{flex:1}} onClick={()=>setConfirmDel(false)}>Annuler</button>
+              <button className="btn btn-danger" style={{flex:1}} onClick={onDelete}>Supprimer</button>
             </div>
           </div>
         </div>
@@ -590,62 +470,38 @@ function AssetDetail({ asset, entities, locations, onEdit, onDelete, onBack, onQ
   );
 }
 
-// ─── INVENTORY SCREEN ─────────────────────────────────────────────────────────
-function InventoryScreen({ assets, entities, locations, onSelect }) {
-  const [search, setSearch] = useState('');
-  const [catFilter, setCatFilter] = useState('Tous');
-  const [entityFilter, setEntityFilter] = useState('Toutes');
-
-  const cats = ['Tous', ...Object.keys(CATEGORY_EMOJI)];
-  const entityOpts = ['Toutes', ...entities.map(e => e.code)];
-
-  const filtered = assets.filter(a => {
-    const q = search.toLowerCase();
-    const matchSearch = !q || a.label?.toLowerCase().includes(q) || a.code?.toLowerCase().includes(q) || a.brand?.toLowerCase().includes(q) || a.assigned_to?.toLowerCase().includes(q);
-    const matchCat = catFilter === 'Tous' || a.category === catFilter;
-    const entity = entities.find(e => e.id === a.entity_id);
-    const matchEntity = entityFilter === 'Toutes' || entity?.code === entityFilter;
-    return matchSearch && matchCat && matchEntity;
+// INVENTORY
+function InventoryScreen({assets,entities,locations,onSelect}){
+  const [search,setSearch]=useState('');
+  const [entF,setEntF]=useState('Toutes');
+  const opts=['Toutes',...entities.map(e=>e.code)];
+  const filtered=assets.filter(a=>{
+    const q=search.toLowerCase();
+    const ok=!q||a.label?.toLowerCase().includes(q)||a.serial?.toLowerCase().includes(q)||a.brand?.toLowerCase().includes(q)||a.assigned_to?.toLowerCase().includes(q);
+    const ent=entities.find(e=>e.id===a.entity_id);
+    return ok&&(entF==='Toutes'||ent?.code===entF);
   });
-
-  return (
+  return(
     <div>
-      <div className="search-bar">
-        <span className="search-icon"><Icon name="search" size={16} /></span>
-        <input className="form-input" style={{ paddingLeft: 40 }} placeholder="Chercher par nom, code, marque…" value={search} onChange={e => setSearch(e.target.value)} />
+      <div style={{position:'relative',marginBottom:14}}>
+        <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--text3)'}}><Icon name="search" size={16}/></span>
+        <input className="form-input" style={{paddingLeft:40}} placeholder="Rechercher…" value={search} onChange={e=>setSearch(e.target.value)}/>
       </div>
-
-      <div className="chips">
-        {entityOpts.map(e => <div key={e} className={`chip ${entityFilter === e ? 'active' : ''}`} onClick={() => setEntityFilter(e)}>{e}</div>)}
-      </div>
-      <div className="chips">
-        {cats.map(c => <div key={c} className={`chip ${catFilter === c ? 'active' : ''}`} onClick={() => setCatFilter(c)}>{CATEGORY_EMOJI[c] || ''} {c}</div>)}
-      </div>
-
-      <div style={{ fontSize: 12, color: 'var(--text3)', fontFamily: 'var(--mono)', marginBottom: 12 }}>{filtered.length} asset{filtered.length > 1 ? 's' : ''}</div>
-
-      {filtered.length === 0 && (
-        <div className="empty"><div className="empty-icon">🔍</div><div className="empty-text">Aucun résultat</div><div className="empty-sub">Modifiez vos filtres</div></div>
-      )}
-
-      {filtered.map(a => {
-        const entity = entities.find(e => e.id === a.entity_id);
-        const location = locations.find(l => l.id === a.location_id);
-        return (
-          <div key={a.id} className="asset-item" onClick={() => onSelect(a)}>
-            <div className="asset-icon" style={{ background: 'var(--surface2)' }}>{CATEGORY_EMOJI[a.category] || '📦'}</div>
+      <div className="chips">{opts.map(e=><div key={e} className={`chip${entF===e?' active':''}`} onClick={()=>setEntF(e)}>{e}</div>)}</div>
+      <div style={{fontSize:12,color:'var(--text3)',fontFamily:'var(--mono)',marginBottom:12}}>{filtered.length} asset{filtered.length!==1?'s':''}</div>
+      {filtered.length===0&&<div className="empty"><div className="empty-icon">🔍</div><div className="empty-text">Aucun résultat</div></div>}
+      {filtered.map(a=>{
+        const ent=entities.find(e=>e.id===a.entity_id);
+        const loc=locations.find(l=>l.id===a.location_id);
+        return(
+          <div key={a.id} className="asset-item" onClick={()=>onSelect(a)}>
+            <div className="asset-icon">{EMOJI[a.category]||'📦'}</div>
             <div className="asset-info">
-              <div className="asset-name">{a.label}</div>
-              <div className="asset-meta">
-                {entity && <span style={{ color: entity.color }}>{entity.code} · </span>}
-                {location?.name || 'Non localisé'}
-              </div>
-              <div style={{ marginTop: 4 }}>
-                <span className={`badge ${STATUS_BADGE[a.status]}`} style={{ fontSize: 11 }}>{STATUS_FR[a.status]}</span>
-                {a.scrape_queued && !a.manufacturer_data && <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--warn)' }}>⏳</span>}
-              </div>
+              <div className="asset-name">{a.brand} {a.label}</div>
+              <div className="asset-meta">{ent&&<span style={{color:ent.color}}>{ent.code} · </span>}{loc?.name||'Non localisé'}</div>
+              <div style={{marginTop:4}}><span className={`badge ${SBADGE[a.status]||'badge-gray'}`} style={{fontSize:11}}>{a.status}</span></div>
             </div>
-            <div className="asset-arrow"><Icon name="arrow" size={18} /></div>
+            <Icon name="arrow" size={18}/>
           </div>
         );
       })}
@@ -653,51 +509,28 @@ function InventoryScreen({ assets, entities, locations, onSelect }) {
   );
 }
 
-// ─── DASHBOARD ────────────────────────────────────────────────────────────────
-function Dashboard({ assets, entities, queue }) {
-  const total = assets.length;
-  const inUse = assets.filter(a => a.status === 'In use').length;
-  const pending = queue.length;
-  const enriched = assets.filter(a => a.manufacturer_data).length;
-
-  const byEntity = entities.map(e => ({
-    ...e, count: assets.filter(a => a.entity_id === e.id).length
-  }));
-
-  const byCat = Object.keys(CATEGORY_EMOJI).map(c => ({
-    cat: c, count: assets.filter(a => a.category === c).length
-  })).filter(x => x.count > 0);
-
-  return (
+// DASHBOARD
+function Dashboard({assets,entities,queue}){
+  const byEnt=entities.map(e=>({...e,count:assets.filter(a=>a.entity_id===e.id).length}));
+  return(
     <div>
       <div className="stat-grid">
-        <div className="stat-card"><div className="stat-num">{total}</div><div className="stat-label">Assets total</div></div>
-        <div className="stat-card"><div className="stat-num" style={{ color: 'var(--accent)' }}>{inUse}</div><div className="stat-label">En service</div></div>
-        <div className="stat-card"><div className="stat-num" style={{ color: 'var(--warn)' }}>{pending}</div><div className="stat-label">File Playwright</div></div>
-        <div className="stat-card"><div className="stat-num" style={{ color: 'var(--accent2)' }}>{enriched}</div><div className="stat-label">Enrichis</div></div>
+        <div className="stat-card"><div className="stat-num">{assets.length}</div><div className="stat-label">Assets total</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--accent)'}}>{assets.filter(a=>a.status==='En service').length}</div><div className="stat-label">En service</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--warn)'}}>{queue.length}</div><div className="stat-label">File Playwright</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--accent2)'}}>{assets.filter(a=>a.manufacturer_data).length}</div><div className="stat-label">Enrichis</div></div>
       </div>
-
       <div className="card">
-        <div className="card-title" style={{ marginBottom: 12 }}>Par entité</div>
-        {byEntity.map(e => (
-          <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-            <span style={{ color: e.color, fontWeight: 600, fontSize: 14 }}>{e.code}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 80, height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-                <div style={{ width: `${total ? (e.count / total) * 100 : 0}%`, height: '100%', background: e.color, borderRadius: 2 }} />
+        <div className="card-title">Par entité</div>
+        {byEnt.map(e=>(
+          <div key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+            <span style={{color:e.color,fontWeight:600}}>{e.code}</span>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <div style={{width:80,height:4,background:'var(--border)',borderRadius:2,overflow:'hidden'}}>
+                <div style={{width:`${assets.length?(e.count/assets.length)*100:0}%`,height:'100%',background:e.color,borderRadius:2}}/>
               </div>
-              <span style={{ fontFamily: 'var(--mono)', fontSize: 13, minWidth: 20, textAlign: 'right' }}>{e.count}</span>
+              <span style={{fontFamily:'var(--mono)',fontSize:13,minWidth:20,textAlign:'right'}}>{e.count}</span>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="card">
-        <div className="card-title" style={{ marginBottom: 12 }}>Par catégorie</div>
-        {byCat.map(({ cat, count }) => (
-          <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-            <span style={{ fontSize: 14 }}>{CATEGORY_EMOJI[cat]} {cat}</span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text2)' }}>{count}</span>
           </div>
         ))}
       </div>
@@ -705,280 +538,173 @@ function Dashboard({ assets, entities, queue }) {
   );
 }
 
-// ─── EXPORT SCREEN ────────────────────────────────────────────────────────────
-function ExportScreen({ assets, queue, onImport }) {
-  const [tab, setTab] = useState('export');
-  const fileRef = useRef();
-
-  const exportJSON = () => {
-    const data = {
-      export_date: now(),
-      version: '1.0',
-      app: 'AssetScan',
-      assets,
-      scrape_queue: queue.map(q => ({ ...q, status: 'pending' }))
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url;
-    a.download = `assetscan_export_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click(); URL.revokeObjectURL(url);
+// EXPORT
+function ExportScreen({assets,queue,onImport}){
+  const [tab,setTab]=useState('export');
+  const fileRef=useRef();
+  const exportJSON=()=>{
+    const blob=new Blob([JSON.stringify({export_date:now(),version:'1.0',assets,scrape_queue:queue},null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`assetscan_${new Date().toISOString().slice(0,10)}.json`;a.click();
   };
-
-  const exportCSV = () => {
-    const headers = ['id', 'code', 'code_type', 'label', 'brand', 'model', 'serial', 'category', 'status', 'condition', 'entity_id', 'location_id', 'location_detail', 'assigned_to', 'notes', 'created_at'];
-    const rows = assets.map(a => headers.map(h => `"${(a[h] || '').toString().replace(/"/g, '""')}"`).join(','));
-    const csv = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url;
-    a.download = `assetscan_export_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click(); URL.revokeObjectURL(url);
+  const exportCSV=()=>{
+    const h=['serial','label','brand','category','status','condition','entity_id','location_id','assigned_to','notes'];
+    const rows=assets.map(a=>h.map(k=>`"${(a[k]||'').toString().replace(/"/g,'""')}"`).join(','));
+    const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`assetscan_${new Date().toISOString().slice(0,10)}.csv`;a.click();
   };
-
-  const handleImport = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        onImport(data);
-      } catch { alert('Fichier JSON invalide'); }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  };
-
-  return (
+  return(
     <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        {['export', 'import', 'queue'].map(t => (
-          <button key={t} className={`btn ${tab === t ? 'btn-primary' : 'btn-secondary'} btn-sm`} style={{ flex: 1, textTransform: 'capitalize' }} onClick={() => setTab(t)}>
-            {t === 'export' ? '📤 Export' : t === 'import' ? '📥 Import' : '🕷️ Queue'}
+      <div style={{display:'flex',gap:8,marginBottom:16}}>
+        {['export','import','queue'].map(t=>(
+          <button key={t} className={`btn ${tab===t?'btn-primary':'btn-secondary'} btn-sm`} style={{flex:1}} onClick={()=>setTab(t)}>
+            {t==='export'?'📤 Export':t==='import'?'📥 Import':'🕷️ Queue'}
           </button>
         ))}
       </div>
-
-      {tab === 'export' && (
-        <div>
-          <div className="section-title">Exporter les données</div>
-          <div className="card" style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 14, marginBottom: 14, color: 'var(--text2)' }}>
-              Export JSON complet (assets + file Playwright). À copier sur le PC pour le script Playwright.
-            </div>
-            <button className="btn btn-primary btn-full" onClick={exportJSON}>
-              <Icon name="export" size={18} /> Exporter JSON ({assets.length} assets)
-            </button>
-          </div>
-          <div className="card">
-            <div style={{ fontSize: 14, marginBottom: 14, color: 'var(--text2)' }}>
-              Export CSV — tableau de bord Excel/Calc.
-            </div>
-            <button className="btn btn-secondary btn-full" onClick={exportCSV}>
-              📊 Exporter CSV
-            </button>
-          </div>
-          <div className="card" style={{ background: 'rgba(0,229,160,0.03)', borderColor: 'rgba(0,229,160,0.12)' }}>
-            <div className="card-title" style={{ marginBottom: 10, color: 'var(--accent)' }}>Option A — Workflow PC</div>
-            <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.7 }}>
-              1. Exporter le JSON depuis cette app<br />
-              2. Copier le fichier sur votre PC<br />
-              3. Lancer le script Playwright<br />
-              4. Le script enrichit les fiches constructeur<br />
-              5. Réimporter le JSON enrichi ici
-            </div>
+      {tab==='export'&&<>
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{fontSize:14,color:'var(--text2)',marginBottom:14}}>Export JSON complet — à copier sur le PC pour Playwright.</div>
+          <button className="btn btn-primary btn-full" onClick={exportJSON}><Icon name="export" size={18}/> JSON ({assets.length} assets)</button>
+        </div>
+        <div className="card">
+          <div style={{fontSize:14,color:'var(--text2)',marginBottom:14}}>Export CSV — pour Excel / LibreOffice.</div>
+          <button className="btn btn-secondary btn-full" onClick={exportCSV}>📊 CSV</button>
+        </div>
+        <div className="card" style={{background:'rgba(0,229,160,.03)',borderColor:'rgba(0,229,160,.12)'}}>
+          <div className="card-title" style={{color:'var(--accent)'}}>Workflow Option A</div>
+          <div style={{fontSize:13,color:'var(--text2)',lineHeight:1.8}}>
+            1️⃣ Exporter le JSON depuis l'app<br/>2️⃣ Copier sur le PC (USB ou email)<br/>3️⃣ Lancer le script Playwright<br/>4️⃣ Réimporter le JSON enrichi ici
           </div>
         </div>
-      )}
-
-      {tab === 'import' && (
-        <div>
-          <div className="section-title">Importer un JSON enrichi</div>
-          <div className="card">
-            <div style={{ fontSize: 14, color: 'var(--text2)', marginBottom: 16, lineHeight: 1.6 }}>
-              Importez le fichier JSON retourné par le script Playwright pour enrichir les fiches avec les données constructeur.
-            </div>
-            <div className="export-box" onClick={() => fileRef.current?.click()} style={{ cursor: 'pointer' }}>
-              <div className="export-icon">📁</div>
-              <div style={{ fontSize: 15, marginBottom: 4 }}>Choisir un fichier JSON</div>
-              <div style={{ fontSize: 12, color: 'var(--text3)' }}>assetscan_enriched_*.json</div>
-            </div>
-            <input ref={fileRef} type="file" accept=".json" style={{ display: 'none' }} onChange={handleImport} />
-          </div>
+      </>}
+      {tab==='import'&&<div className="card">
+        <div style={{fontSize:14,color:'var(--text2)',marginBottom:16,lineHeight:1.6}}>Importez le JSON retourné par Playwright pour enrichir les fiches constructeur.</div>
+        <div className="export-box" onClick={()=>fileRef.current?.click()}>
+          <div style={{fontSize:36,marginBottom:8}}>📁</div>
+          <div style={{fontSize:15}}>Choisir un fichier JSON</div>
+          <div style={{fontSize:12,color:'var(--text3)',marginTop:4}}>assetscan_enriched_*.json</div>
         </div>
-      )}
-
-      {tab === 'queue' && (
-        <div>
-          <div className="section-title">File d'attente Playwright</div>
-          {queue.length === 0 ? (
-            <div className="empty"><div className="empty-icon">✅</div><div className="empty-text">File vide</div><div className="empty-sub">Ajoutez des assets à scraper depuis leur fiche</div></div>
-          ) : (
-            <>
-              <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 12 }}>
-                {queue.length} asset{queue.length > 1 ? 's' : ''} en attente d'enrichissement constructeur
-              </div>
-              {queue.map(q => (
-                <div key={q.id} className="queue-item">
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 500 }}>{q.label}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text2)', fontFamily: 'var(--mono)' }}>{q.brand} {q.model}</div>
-                  </div>
-                  <div className="queue-dot" />
-                </div>
-              ))}
-              <button className="btn btn-primary btn-full" style={{ marginTop: 12 }} onClick={exportJSON}>
-                <Icon name="export" size={18} /> Exporter avec la file
-              </button>
-            </>
-          )}
-        </div>
+        <input ref={fileRef} type="file" accept=".json" style={{display:'none'}}
+          onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{onImport(JSON.parse(ev.target.result));}catch{alert('Fichier invalide');}};r.readAsText(f);e.target.value='';}}/>
+      </div>}
+      {tab==='queue'&&(queue.length===0
+        ?<div className="empty"><div className="empty-icon">✅</div><div className="empty-text">File vide</div></div>
+        :<>{queue.map(q=><div key={q.id} className="queue-item"><div><div style={{fontSize:14,fontWeight:500}}>{q.brand} {q.label}</div><div style={{fontSize:12,color:'var(--text2)',fontFamily:'var(--mono)'}}>{q.serial}</div></div><div className="queue-dot"/></div>)}
+          <button className="btn btn-primary btn-full" style={{marginTop:12}} onClick={exportJSON}><Icon name="export" size={18}/> Exporter avec la file</button></>
       )}
     </div>
   );
 }
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-function App() {
+// MAIN APP
+function App(){
   initDB();
-  const [tab, setTab] = useState('home');
-  const [assets, setAssets] = useState(() => DB.get(ASSETS_KEY));
-  const [entities] = useState(() => DB.get(ENTITIES_KEY));
-  const [locations] = useState(() => DB.get(LOCATIONS_KEY));
-  const [queue, setQueue] = useState(() => DB.get(QUEUE_KEY));
-  const [view, setView] = useState(null); // null | 'detail' | 'form' | 'new'
-  const [selected, setSelected] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [scannedCode, setScannedCode] = useState(null);
+  const [tab,setTab]=useState('home');
+  const [assets,setAssets]=useState(()=>DB.get('sc_assets',[]));
+  const [entities,setEntities]=useState(()=>DB.get('sc_entities',DEF_ENTITIES));
+  const [locations,setLocations]=useState(()=>DB.get('sc_locs',DEF_LOCS));
+  const [cats,setCats]=useState(()=>DB.get('sc_cats',DEF_CATS));
+  const [brands,setBrands]=useState(()=>DB.get('sc_brands',DEF_BRANDS));
+  const [statuses,setStatuses]=useState(()=>DB.get('sc_status',DEF_STATUS));
+  const [conds,setConds]=useState(()=>DB.get('sc_cond',DEF_COND));
+  const [queue,setQueue]=useState(()=>DB.get('sc_queue',[]));
+  const [view,setView]=useState(null);
+  const [selected,setSelected]=useState(null);
+  const [pendingCode,setPendingCode]=useState(null);
+  const [toast,setToast]=useState(null);
 
-  const saveAssets = (a) => { setAssets(a); DB.set(ASSETS_KEY, a); };
-  const saveQueue = (q) => { setQueue(q); DB.set(QUEUE_KEY, q); };
-  const showToast = (msg) => { setToast(msg); };
+  const saveAssets=a=>{setAssets(a);DB.set('sc_assets',a);};
+  const saveQueue=q=>{setQueue(q);DB.set('sc_queue',q);};
+  const showToast=msg=>setToast(msg);
 
-  const handleScanned = (code, type) => {
-    const existing = assets.find(a => a.code === code);
-    if (existing) {
-      setSelected(existing);
-      setView('detail');
-      setTab('inventory');
-      showToast('✓ Asset trouvé');
-    } else {
-      setScannedCode({ code, code_type: type });
-      setView('new');
-      setTab('inventory');
-    }
+  const handleAddToList=(listName,value)=>{
+    if(listName==='entities'){const u=[...entities,value];setEntities(u);DB.set('sc_entities',u);}
+    else if(listName==='cats'){const u=[...cats,value];setCats(u);DB.set('sc_cats',u);}
+    else if(listName==='brands'){const u=[...brands,value];setBrands(u);DB.set('sc_brands',u);}
+    else if(listName==='statuses'){const u=[...statuses,value];setStatuses(u);DB.set('sc_status',u);}
+    else if(listName==='conds'){const u=[...conds,value];setConds(u);DB.set('sc_cond',u);}
+    else if(listName==='locs'){const u=[...locations,value];setLocations(u);DB.set('sc_locs',u);}
   };
 
-  const handleSave = (form) => {
-    const isNew = !form.id;
-    const asset = { ...form, id: form.id || uuid(), created_at: form.created_at || now(), updated_at: now(), synced: false, manufacturer_data: form.manufacturer_data || null, scrape_queued: form.scrape_queued || false, photos: form.photos || [] };
-    const updated = isNew ? [...assets, asset] : assets.map(a => a.id === asset.id ? asset : a);
-    saveAssets(updated);
-    setSelected(asset);
-    setView('detail');
-    showToast(isNew ? '✓ Asset créé' : '✓ Asset mis à jour');
+  const handleScanned=code=>{
+    const existing=assets.find(a=>a.serial===code);
+    if(existing){setSelected(existing);setView('detail');setTab('inventory');showToast('✓ Asset trouvé');}
+    else{setPendingCode(code);setTab('inventory');}
   };
 
-  const handleDelete = () => {
-    const updated = assets.filter(a => a.id !== selected.id);
-    const updatedQ = queue.filter(q => q.id !== selected.id);
-    saveAssets(updated);
-    saveQueue(updatedQ);
-    setSelected(null); setView(null);
-    showToast('Asset supprimé');
+  const handleSerialYes=serial=>{setPendingCode(null);setSelected({serial});setView('new');};
+  const handleSerialNo=()=>{setPendingCode(null);setSelected({});setView('new');};
+
+  const handleSave=form=>{
+    const isNew=!form.id;
+    const asset={...form,id:form.id||uuid(),created_at:form.created_at||now(),updated_at:now(),synced:false,manufacturer_data:form.manufacturer_data||null,scrape_queued:form.scrape_queued||false};
+    saveAssets(isNew?[...assets,asset]:assets.map(a=>a.id===asset.id?asset:a));
+    setSelected(asset);setView('detail');
+    showToast(isNew?'✓ Asset créé':'✓ Mis à jour');
   };
 
-  const handleQueueScrape = (id) => {
-    const asset = assets.find(a => a.id === id);
-    if (!asset) return;
-    const updatedAssets = assets.map(a => a.id === id ? { ...a, scrape_queued: true } : a);
-    const updatedQ = [...queue.filter(q => q.id !== id), { id, label: asset.label, brand: asset.brand, model: asset.model, manufacturer_url: asset.manufacturer_url, code: asset.code }];
-    saveAssets(updatedAssets);
-    saveQueue(updatedQ);
-    setSelected({ ...asset, scrape_queued: true });
-    showToast('🕷️ Ajouté à la file Playwright');
+  const handleDelete=()=>{
+    saveAssets(assets.filter(a=>a.id!==selected.id));
+    saveQueue(queue.filter(q=>q.id!==selected.id));
+    setSelected(null);setView(null);showToast('Asset supprimé');
   };
 
-  const handleImport = (data) => {
-    if (!data.assets) { alert('Format invalide'); return; }
-    const merged = data.assets.map(imported => {
-      const existing = assets.find(a => a.id === imported.id);
-      return existing ? { ...existing, manufacturer_data: imported.manufacturer_data || existing.manufacturer_data, scrape_queued: !imported.manufacturer_data, updated_at: now() } : imported;
-    });
-    const newIds = new Set(merged.map(a => a.id));
-    const kept = assets.filter(a => !newIds.has(a.id));
-    saveAssets([...kept, ...merged]);
+  const handleQueueScrape=id=>{
+    const asset=assets.find(a=>a.id===id);if(!asset)return;
+    saveAssets(assets.map(a=>a.id===id?{...a,scrape_queued:true}:a));
+    saveQueue([...queue.filter(q=>q.id!==id),{id,serial:asset.serial,label:asset.label,brand:asset.brand,manufacturer_url:asset.manufacturer_url}]);
+    setSelected({...asset,scrape_queued:true});
+    showToast('🕷️ Ajouté à la file');
+  };
+
+  const handleImport=data=>{
+    if(!data.assets){alert('Format invalide');return;}
+    saveAssets(assets.map(a=>{const imp=data.assets.find(i=>i.id===a.id);return imp?{...a,manufacturer_data:imp.manufacturer_data||a.manufacturer_data,updated_at:now()}:a;}));
     showToast(`✓ Import: ${data.assets.length} assets`);
   };
 
-  const goBack = () => { setView(null); setSelected(null); setScannedCode(null); };
+  const goBack=()=>{setView(null);setSelected(null);setPendingCode(null);};
 
-  const headerTitle = () => {
-    if (view === 'detail') return selected?.label?.slice(0, 22) || 'Détail';
-    if (view === 'form') return 'Modifier';
-    if (view === 'new') return 'Nouvel asset';
-    return { home: 'Tableau de bord', scan: 'Scanner', inventory: 'Inventaire', export: 'Export / Sync' }[tab];
+  const lists={cats,brands,statuses,conds};
+  const showBack=view||pendingCode;
+
+  const headerTitle=()=>{
+    if(pendingCode)return'Confirmer le S/N';
+    if(view==='detail')return'Détail asset';
+    if(view==='form')return'Modifier';
+    if(view==='new')return'Nouvel asset';
+    return{home:'Tableau de bord',scan:'Scanner',inventory:'Inventaire',export:'Export / Sync'}[tab];
   };
 
-  return (
+  return(
     <div className="app">
-      {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
-
+      {toast&&<Toast msg={toast} onDone={()=>setToast(null)}/>}
       <div className="header">
-        <div>
-          {(view) ? (
-            <button className="btn btn-secondary btn-sm" style={{ padding: '6px 12px' }} onClick={goBack}>
-              <Icon name="back" size={16} /> Retour
-            </button>
-          ) : (
-            <div>
-              <div className="header-logo">ASSET<span style={{ color: 'var(--accent2)' }}>SCAN</span></div>
-              <div className="header-sub">v1.0 — Option A</div>
-            </div>
-          )}
-        </div>
-        {view && <div style={{ fontWeight: 600, fontSize: 16, flex: 1, textAlign: 'center', paddingRight: 60 }}>{headerTitle()}</div>}
-        {!view && tab === 'inventory' && (
-          <button className="btn btn-primary btn-sm" onClick={() => { setScannedCode(null); setView('new'); }}>
-            <Icon name="plus" size={16} />
-          </button>
+        {showBack
+          ?<button className="btn btn-secondary btn-sm" onClick={goBack}><Icon name="back" size={16}/> Retour</button>
+          :<div><div className="header-logo">ASSET<span style={{color:'var(--accent2)'}}>SCAN</span></div><div className="header-sub">v2.0</div></div>
+        }
+        <div style={{fontWeight:600,fontSize:15,flex:1,textAlign:showBack?'center':'right',paddingRight:showBack?60:0}}>{showBack?headerTitle():''}</div>
+        {!showBack&&tab==='inventory'&&(
+          <button className="btn btn-primary btn-sm" onClick={()=>{setSelected({});setView('new');}}><Icon name="plus" size={16}/></button>
         )}
       </div>
-
       <div className="content">
-        {!view && tab === 'home' && <Dashboard assets={assets} entities={entities} queue={queue} />}
-        {!view && tab === 'scan' && <ScanScreen onScanned={handleScanned} />}
-        {!view && tab === 'inventory' && <InventoryScreen assets={assets} entities={entities} locations={locations} onSelect={(a) => { setSelected(a); setView('detail'); }} />}
-        {!view && tab === 'export' && <ExportScreen assets={assets} queue={queue} onImport={handleImport} />}
-
-        {view === 'detail' && selected && (
-          <AssetDetail asset={selected} entities={entities} locations={locations}
-            onEdit={() => setView('form')}
-            onDelete={handleDelete}
-            onBack={goBack}
-            onQueueScrape={handleQueueScrape}
-          />
-        )}
-        {view === 'form' && selected && (
-          <AssetForm initial={selected} entities={entities} locations={locations} onSave={handleSave} onCancel={() => setView('detail')} />
-        )}
-        {view === 'new' && (
-          <AssetForm initial={scannedCode || {}} entities={entities} locations={locations} onSave={handleSave} onCancel={goBack} />
-        )}
+        {pendingCode&&!view&&<SerialConfirm code={pendingCode} onYes={handleSerialYes} onNo={handleSerialNo}/>}
+        {!pendingCode&&!view&&tab==='home'&&<Dashboard assets={assets} entities={entities} queue={queue}/>}
+        {!pendingCode&&!view&&tab==='scan'&&<ScanScreen onScanned={handleScanned}/>}
+        {!pendingCode&&!view&&tab==='inventory'&&<InventoryScreen assets={assets} entities={entities} locations={locations} onSelect={a=>{setSelected(a);setView('detail');}}/>}
+        {!pendingCode&&!view&&tab==='export'&&<ExportScreen assets={assets} queue={queue} onImport={handleImport}/>}
+        {view==='detail'&&selected&&<AssetDetail asset={selected} entities={entities} locations={locations} onEdit={()=>setView('form')} onDelete={handleDelete} onQueueScrape={handleQueueScrape}/>}
+        {(view==='form'||view==='new')&&<AssetForm initial={selected||{}} entities={entities} locations={locations} lists={lists} onAddToList={handleAddToList} onSave={handleSave} onCancel={()=>view==='new'?goBack():setView('detail')}/>}
       </div>
-
-      {!view && (
+      {!view&&!pendingCode&&(
         <nav className="nav">
-          {[
-            { id: 'home', icon: 'home', label: 'Accueil' },
-            { id: 'inventory', icon: 'list', label: 'Inventaire' },
-            { id: 'scan', icon: 'scan', label: 'Scanner', primary: true },
-            { id: 'export', icon: 'export', label: 'Export' },
-          ].map(n => (
-            <button key={n.id} className={`nav-btn ${tab === n.id ? 'active' : ''} ${n.primary ? 'scan-btn' : ''}`} onClick={() => setTab(n.id)}>
-              <Icon name={n.icon} size={n.primary ? 24 : 22} />
-              <span>{n.label}</span>
+          {[{id:'home',icon:'home',label:'Accueil'},{id:'inventory',icon:'list',label:'Inventaire'},{id:'scan',icon:'scan',label:'Scanner',primary:true},{id:'export',icon:'export',label:'Export'}].map(n=>(
+            <button key={n.id} className={`nav-btn${tab===n.id?' active':''}${n.primary?' scan-btn':''}`} onClick={()=>setTab(n.id)}>
+              <Icon name={n.icon} size={n.primary?24:22}/><span>{n.label}</span>
             </button>
           ))}
         </nav>
@@ -986,8 +712,7 @@ function App() {
     </div>
   );
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
